@@ -1,0 +1,13 @@
+# action.yml
+name: 'Scancode'
+description: 'Scan licenses and compyrights in code'
+inputs:
+  directory-to-scan:  # id of input
+    description: 'Which directory to scan'
+    required: false
+    default: 'scancode-files'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.directory-to-scan }}
