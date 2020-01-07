@@ -1,0 +1,14 @@
+license:
+  main: apache-2.0
+  category: Permissive
+exclude:
+  extensions:
+    - yml
+    - yaml
+    - html
+    - rst
+    - conf
+    - cfg
+  langs:
+    - HTML
+
