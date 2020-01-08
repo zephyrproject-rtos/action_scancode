@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Scan the code
       id: scancode
-      uses: zephyrproject-rtos/action_scancode@master
+      uses: zephyrproject-rtos/action_scancode@v1
       with:
         directory-to-scan: 'scan/'
     - name: Artifact Upload
