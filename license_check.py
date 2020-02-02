@@ -14,6 +14,7 @@ def analyze_file(config_file, scancode_file, scanned_files_dir):
         config = yaml.safe_load(f.read())
 
     report = ""
+
     exclude = config.get("exclude")
     if exclude:
         never_check_ext =  exclude.get("extensions", [])
@@ -22,11 +23,20 @@ def analyze_file(config_file, scancode_file, scanned_files_dir):
         never_check_ext = []
         never_check_langs = []
 
+    copyrights = config.get("copyright", {})
+    check_copytight = copyrights.get("check", False)
     lic_config = config.get("license")
     lic_main = lic_config.get("main")
     lic_cat = lic_config.get("category")
+    report_missing_license = lic_config.get("report_missing", False)
+    more_lic = lic_config.get('additional', [])
+    more_lic.append(lic_main)
 
-    check_langs = ['CMake']
+
+    if check_copytight:
+        print("Will check for missing copyrights...")
+
+    check_langs = []
     with open(scancode_file, 'r') as json_fp:
         scancode_results = json.load(json_fp)
         for file in scancode_results['files']:
@@ -53,11 +63,11 @@ def analyze_file(config_file, scancode_file, scanned_files_dir):
                 check = True
 
             if check:
-                if not licenses:
+                if not licenses and not report_missing_license:
                     report += ("* {} missing license.\n".format(orig_path))
                 else:
                     for lic in licenses:
-                        if lic['key'] != lic_main:
+                        if lic['key'] not in more_lic:
                             report += ("* {} is not {} licensed: {}\n".format(
                                 orig_path, lic_main, lic['key']))
                         if lic['category'] != lic_cat:
@@ -67,7 +77,8 @@ def analyze_file(config_file, scancode_file, scanned_files_dir):
                             report += ("* {} has unknown SPDX: {}\n".format(
                                 orig_path, lic['key']))
 
-                if not file['copyrights'] and file.get("programming_language") != 'CMake':
+                if check_copytight and not file['copyrights'] and \
+                        file.get("programming_language") != 'CMake':
                     report += ("* {} missing copyright.\n".format(orig_path))
 
 
