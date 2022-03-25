@@ -14,7 +14,7 @@ mkdir -p /github/workspace/artifacts
 cd /scancode-toolkit
 ./scancode \
 	-clipeu \
-	--license-diag \
+	--license --license-policy --license-text \
 	--classify \
 	--summary \
 	--verbose /github/workspace/$1 \
