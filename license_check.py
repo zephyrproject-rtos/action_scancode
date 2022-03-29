@@ -29,9 +29,16 @@ def analyze_file(config_file, scancode_file, scanned_files_dir):
     lic_main = lic_config.get("main")
     lic_cat = lic_config.get("category")
     report_missing_license = lic_config.get("report_missing", False)
+    more_cat = []
+    more_cat.append(lic_cat)
     more_lic = lic_config.get('additional', [])
     more_lic.append(lic_main)
 
+    # Scancode may report 'unknown-license-reference' if there are lines
+    # containing the word 'license' in the source files, so ignore these for
+    # now.
+    more_cat.append('Unstated License')
+    more_lic.append('unknown-license-reference')
 
     if check_copytight:
         print("Will check for missing copyrights...")
@@ -68,11 +75,11 @@ def analyze_file(config_file, scancode_file, scanned_files_dir):
                 else:
                     for lic in licenses:
                         if lic['key'] not in more_lic:
-                            report += ("* {} is not {} licensed: {}\n".format(
-                                orig_path, lic_main, lic['key']))
-                        if lic['category'] != lic_cat:
-                            report += ("* {} has non-permissive license: {}\n".format(
+                            report += ("* {} has invalid license: {}\n".format(
                                 orig_path, lic['key']))
+                        if lic['category'] not in more_cat:
+                            report += ("* {} has invalid license type: {}\n".format(
+                                orig_path, lic['category']))
                         if lic['key'] == 'unknown-spdx':
                             report += ("* {} has unknown SPDX: {}\n".format(
                                 orig_path, lic['key']))
